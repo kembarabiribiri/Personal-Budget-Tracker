@@ -61,12 +61,26 @@
         th {
             background-color: #f2f2f2;
         }
-        .summary {
+        .summary, .category-analysis {
             margin: 20px 0;
-            padding: 10px;
+            padding: 20px;
             background-color: #f9f9f9;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .summary-details, .category-analysis {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .summary-details div, .category-analysis div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
         }
     </style>
 </head>
@@ -114,9 +128,25 @@
 
     <section class="summary">
         <h2>Spending Summary</h2>
-        <p>Total Income: RM <span id="totalIncome">0.00</span></p>
-        <p>Total Expense: RM <span id="totalExpense">0.00</span></p>
-        <p>Net Savings: RM <span id="netSavings">0.00</span></p>
+        <div class="summary-details">
+            <div>
+                <strong>Total Income:</strong>
+                <p>RM <span id="totalIncome">0.00</span></p>
+            </div>
+            <div>
+                <strong>Total Expense:</strong>
+                <p>RM <span id="totalExpense">0.00</span></p>
+            </div>
+            <div>
+                <strong>Net Savings:</strong>
+                <p>RM <span id="netSavings">0.00</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Category Analysis</h2>
+        <div id="categoryAnalysis" class="category-analysis"></div>
     </section>
 </main>
 
@@ -180,6 +210,30 @@
         document.getElementById("totalIncome").innerText = totalIncome.toFixed(2);
         document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
         document.getElementById("netSavings").innerText = (totalIncome - totalExpense).toFixed(2);
+
+        updateCategoryAnalysis();
+    }
+
+    function updateCategoryAnalysis() {
+        const categoryMap = {};
+        transactions.forEach(transaction => {
+            if (!categoryMap[transaction.category]) {
+                categoryMap[transaction.category] = 0;
+            }
+            categoryMap[transaction.category] += transaction.amount;
+        });
+
+        const categoryAnalysisContainer = document.getElementById("categoryAnalysis");
+        categoryAnalysisContainer.innerHTML = ""; // Clear previous data
+
+        for (const [category, total] of Object.entries(categoryMap)) {
+            const div = document.createElement("div");
+            div.innerHTML = `
+                <strong>${category}:</strong>
+                <span>RM ${total.toFixed(2)}</span>
+            `;
+            categoryAnalysisContainer.appendChild(div);
+        }
     }
 
     window.onload = loadTransactions;
@@ -187,3 +241,4 @@
 
 </body>
 </html>
+
